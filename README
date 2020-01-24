@@ -1,0 +1,57 @@
+Lattice Kinetic Monte Carlo (for the Oxygen Reduction Reaction)
+
+The code shown here has been used to study catalytic activity of various Pt-Ni nanoparticles supported on a substrate of MgO. The core approach of the code is to apply a Kinetic Monte Carlo approach to model the catalytic reactions of the oxygen reduction reaction on the nanoparticles. This code has also been designed to use the generalised coordination number as a descriptor in the reactions involved. In order to achieve this activation energies were first calculated with with ab-initio methods and then applied within the KMC code.
+
+
+Running the code:
+
+In order to run the code the following files are required:
+
+uvalues.py
+KMC_ORR.py
+gcn_KMC_ORR.py
+
+Further to this the activation energies were also selected from one of the four files shown below:
+
+initvalues_CONi.py
+initvalues_COSa.py
+initvalues_TONi.py
+initvalues_TOSa.py
+
+Finally, in order to account for the GCN of the particle involved an xyz file called "Geometrical.xyz" is also required as this is analysed to determine the GCN genome of the nanoparticle involved.
+
+The values within the files of the activation energies were all dependent on the geometries and chemical orderings specified. This is specified with the variable i= (0,1,2,3) in the file uvalues.py. Here 0,1,2 and 3 correspond to CONi, COSa, TONi and TOSa geometries respectively.
+
+To run for different physical conditions, the relevant parameters can be adjusted in the file uvalues.py.
+
+
+To run the full code with gcn classifications accounted for run the code using gcn_KMC_ORR.py. If the desired gcn genome is known this can be written in a file called "inputgcn.dat" where the KMC_ORR.py code can be used.
+
+
+
+Outputs produced:
+
+Of the output files produced from the code these include data on which reactions were most frequent in the simulation, which intermediates and species were most common throughout the simulation amongst others. The full list is provided here:
+
+The outputs have names composed of: {Geometry}_sim{simno}_{quantity}1.dat
+
+{Geometry} is one of the four specified above and {simno} can be determined in uvalues.py to help identify the simulation type.
+
+The values of {quantity} are described here:
+
+agcnstatco  -> describing the number of given species (or none) occupying of all the sites of the nanoparticle
+lgcnstatco  -> describing the number of given species (or none) on low gcn sites
+mgcnstatco  -> as above for medium gcn sites
+hgcnstatco  -> as above for high gcn sites
+
+binddiff      -> a tracker of which adsorbtion or diffusion event took place at each time step
+reaction      -> a tracker of which reaction took place at each time step
+dt_reactions  -> the cummulative time simulated as particular reactions taking place
+dt_binddiffs  -> the cummulative time simulated as diffusion or adsorbtion events taking place
+
+KMC_SUMMARY   -> summary of the simulation (including simulated time, turnover frequency, etc)
+
+
+
+Other reactions:
+In the case used here a particular reaction reaction tree has been used involving forward and backward reactions for the species as well as diffusion and adsorbtion events. If this is to be changed care must be taken to ensure the species and reactions are kept consistent and draw the relevant activation energies for the reactions involved.
