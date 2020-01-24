@@ -3,9 +3,6 @@
 desg = 'COSa'
 
 ncat = 2 # parameter for the size of the nanoparticle
-nl = 5
-nm = 25
-nh = 70
 
 # Droplets type
 # Energies sorted by 
