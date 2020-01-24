@@ -5,9 +5,6 @@ import numpy as np
 desg = 'CONi'
 
 ncat = 2 # parameter for the size of the nanoparticle
-nl = 60
-nm = 32
-nh = 0
 
 # Droplets type
 # Energies sorted by 
