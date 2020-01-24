@@ -3,9 +3,6 @@
 desg = 'TOSa'
 
 ncat = 2 # parameter for the size of the nanoparticle
-nl = 5
-nm = 25
-nh = 70
 
 # Droplets type
 # Energies sorted by 
@@ -96,11 +93,11 @@ l16 = 'true' # L: OH + O -> H2O + O
 l17 = 'true' # L: H2O + OH -> 2H2O + *
 l18 = 'true' # H: O2(g) + * -> O2(a)
 l19 = 'false' # H: O2 -> OOH
-l20 = 'false' # HM: O2 diff
+l20 = 'true' # HM: O2 diff
 l21 = 'false' # HM: OOH diff
 l22 = 'false' # H: OOH -> O2
 l23 = 'true' # L: H2O + OH -> H2O + O
-l24 = 'false' # MH: O2 diff
+l24 = 'false' # MH: O2 diff  ## backwards diffusion from medium to high restricted to reduce compuatational cost of calculation (not a rate limiting step)
 l25 = 'false' # MH: OOH diff
 l26 = 'false' # M: O2 -> 2O
 l27 = 'false' # M: 2O -> OH + O
