@@ -3,9 +3,6 @@
 desg = 'TONi'
 
 ncat = 2 # parameter for the size of the nanoparticle
-nl = 30
-nm = 50
-nh = 20
 
 # Droplets type
 # Energies sorted by 
