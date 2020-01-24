@@ -1,25 +1,43 @@
 import time
 import sys
 import numpy as np
-from reaclass import * # defines classes for reactions as well as move/event operations
 from math import * 
 import random
-from uvalues2 import *
-
+from uvalues import *
+import matplotlib.pyplot as plt
+#from gcn_bridge_onecluster import *
+import os 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+with open("inputgcn.dat", "r") as p:
+	nl = int(p.readline())
+	nm = int(p.readline())
+	nh = int(p.readline())
+	ccluster=int(p.readline())
 # Choice of architecture
 # CONi@I == 0 , COSa == 1, TONi@I == 2 , TOSa == 3
-i = 2
 
 # collects various input conditions
 
 if i==0:
-    from initvalues8CONi import * 
+    from initvalues_CONi import * 
 if i==1:
-    from initvalues8COSa import * 
+    from initvalues_COSa import * 
 if i==2:
-    from initvalues8TONi import * 
+    from initvalues_TONi import * 
 if i==3:
-    from initvalues8TOSa import * 
+    from initvalues_TOSa import * 
+
+
+class Move(object):
+    '''Data structure to store the kinematics of particle movement'''
+    def __init__(self,rate,in_state,fi_state,react,position,gcn):
+        self.rate = rate
+        self.in_state = in_state
+        self.fi_state = fi_state
+        self.react = react
+        self.position = position
+        self.gcn = gcn
+
 
 # Initialization
 random.seed()
@@ -102,34 +120,34 @@ dtypcodiffOOHmh = 0
 # structure for the energies: array of arrays of arrays, smallest arrays are by activation and reaction for low and high, next is by reaction number, finally by domain; [domains]->[[reactions]]->[[[energies]]]
 E_all = [[E1lowact,E1lowreact,E1highact,E1highreact],[E2lowact,E2lowreact,E2highact,E2highreact],[E5lowact,E5lowreact,E5highact,E5highreact],[E6lowact,E6lowreact,E6highact,E6highreact],[E16lowact,E16lowreact,E16highact,E16highreact]]
 
-name = desg+"_collated.dat"
-name3 = "all_collated.dat"
-name2 = desg+"_test"+str(testno)+"_KMC_states"+".dat"
-name4 = desg+"_test"+str(testno)+"_KMC_SUMMARY"+".dat"
+#name = desg+"_collated.dat"
+#name3 = "all_collated.dat"
+#name2 = desg+"_test"+str(simno)+"_KMC_states"str(ccluster)++".dat"
+name4 = desg+"_sim"+str(simno)+"_KMC_SUMMARY"+str(ccluster)+".dat"
 
-col = open(name, 'a')
-allcol = open(name3, 'a')
-g = open(name2, 'w') # file for the states of each site (shows the reactants in each site in the array)
-summ = open(name4, 'w')
+#col = open(name, 'a')
+#allcol = open(name3, 'a')
+#g = open(name2, 'w') # file for the states of each site (shows the reactants in each site in the array)
+summ = open(str(dir_path)+ "/Output/"+name4, 'w')
 
-lgco = open(desg+"_test"+str(testno)+"_lgcnstatco"+".dat",'w')
-mgco = open(desg+"_test"+str(testno)+"_mgcnstatco"+".dat",'w')
-hgco = open(desg+"_test"+str(testno)+"_hgcnstatco"+".dat",'w')
-agco = open(desg+"_test"+str(testno)+"_agcnstatco"+".dat",'w')
+lgco = open(str(dir_path)+"/Output/"+desg+"_sim"+str(simno)+"_lgcnstatco"+str(ccluster)+".dat",'w')
+mgco = open(str(dir_path)+"/Output/"+desg+"_sim"+str(simno)+"_mgcnstatco"+str(ccluster)+".dat",'w')
+hgco = open(str(dir_path)+"/Output/"+desg+"_sim"+str(simno)+"_hgcnstatco"+str(ccluster)+".dat",'w')
+agco = open(str(dir_path)+"/Output/"+desg+"_sim"+str(simno)+"_agcnstatco"+str(ccluster)+".dat",'w')
 
 lgco.write("#itt\tt\t\tO2g\tEmt\tO2a\t2O\tOH+O\tOOH\tH2O+O\t2OH\tH2O+OH\t2H2O \n")
 mgco.write("#itt\tt\t\tO2g\tEmt\tO2a\t2O\tOH+O\tOOH\tH2O+O\t2OH\tH2O+OH\t2H2O \n")
 hgco.write("#itt\tt\t\tO2g\tEmt\tO2a\t2O\tOH+O\tOOH\tH2O+O\t2OH\tH2O+OH\t2H2O \n")
 agco.write("#itt\tt\t\tO2g\tEmt\tO2a\t2O\tOH+O\tOOH\tH2O+O\t2OH\tH2O+OH\t2H2O \n")
 
-reactco = open(desg+"_test"+str(testno)+"_reaction"+".dat",'w')
+reactco = open(str(dir_path)+"/Output/"+desg+"_sim"+str(simno)+"_reaction"+str(ccluster)+".dat",'w')
 reactco.write("#itt\t1\t2\t5\t6\t16\t1in\t2in\t5in\t6in")
-reactdiff = open(desg+"_test"+str(testno)+"_binddiff"+".dat",'w')
+reactdiff = open(str(dir_path)+"/Output/"+desg+"_sim"+str(simno)+"_binddiff"+str(ccluster)+".dat",'w')
 reactdiff.write("#itt\tbinding(l,\tm,\th)\tO2 diff(lm,ml,mh,hm)\tOOH diff(mh,hm)")  
 
-dtreactco = open(desg+"_test"+str(testno)+"_dt_reactionc_test"+".dat",'w')
+dtreactco = open(str(dir_path)+"/Output/"+desg+"_sim"+str(simno)+"_dt_reactions"+str(ccluster)+".dat",'w')
 dtreactco.write("#itt   1  2  5  6  16  1in  2in  5in  6in")
-dtreactdiff = open(desg+"_test"+str(testno)+"_dt_reactiond_test"+".dat",'w')
+dtreactdiff = open(str(dir_path)+"/Output/"+desg+"_sim"+str(simno)+"_dt_binddiffs"+str(ccluster)+".dat",'w')
 dtreactdiff.write("#itt binding(l,m,h) O2 diff(lm,ml,mh,hm)   OOH diff(mh,hm)")  
 
 
@@ -157,6 +175,17 @@ for no in range(nm):
     msites[no] = 0
 for no in range(nh):
     hsites[no] = 0
+    
+time_plot=[]
+Emt=[]
+O2=[]
+TwoO=[]
+OHplusO=[]
+OOH=[]
+H2OplusO=[]
+TwoOH=[]
+H2OplusOH=[]
+water_plot=[]
 
 for itt in range(itt_max + 1):
     '''Fill "moves_list", with Move obj. It is a list containing all the possible moves'''
@@ -861,6 +890,7 @@ for itt in range(itt_max + 1):
             hgco.write(str(itt)+'\t'+str(format(t_total,'.5e'))+'\t'+str(maxdrop-drop)+'\t')
             agco.write(str(itt)+'\t'+str(format(t_total,'.5e'))+'\t'+str(maxdrop-drop)+'\t')
             massb = drop - water
+            reactants_toplot=[]
             for st in range(8):
                 statcol=0
                 statcom=0
@@ -888,10 +918,28 @@ for itt in range(itt_max + 1):
                             massb-=1
                 hgco.write(str(statcoh)+'\t')
                 agco.write(str(statcoa)+'\t')
+                reactants_toplot.append(statcoa)
+                
             lgco.write(str(water)+'\t')
             mgco.write(str(water)+'\t')
             hgco.write(str(water)+'\t')
             agco.write(str(water)+'\t')
+            
+            Emt.append(reactants_toplot[0])
+            O2.append(reactants_toplot[1])
+            TwoO.append(reactants_toplot[2])
+            OHplusO.append(reactants_toplot[3])
+            OOH.append(reactants_toplot[4])
+            H2OplusO.append(reactants_toplot[5])
+            TwoOH.append(reactants_toplot[6])
+            H2OplusOH.append(reactants_toplot[7])
+            water_plot.append(water)
+            
+
+            
+            time_plot.append(t_total)
+            
+			
             if massb != 0:
                 print massb
 
@@ -907,11 +955,11 @@ for itt in range(itt_max + 1):
                 lgc = str(lsites)
                 mgc = str(msites)
                 hgc = str(hsites)
-                g.write(str(itt))
-                g.write(lgc)
-                g.write(mgc)
-                g.write(hgc)
-                g.write("\n")
+                #g.write(str(itt))
+                #g.write(lgc)
+                #g.write(mgc)
+                #g.write(hgc)
+                #g.write("\n")
                 sareact = str(areact)
                 sals = str(als)
                 pt+=1
@@ -933,6 +981,39 @@ for itt in range(itt_max + 1):
         hgco.write('\n')            
         break
 
+
+plt.plot(time_plot, Emt, color="r")
+plt.savefig("Emt_cluster"+str(ccluster))
+plt.close()
+plt.plot(time_plot, O2, color="g")
+plt.savefig("O2_cluster"+str(ccluster))
+plt.close()
+plt.plot(time_plot, TwoO, color="y")
+plt.savefig("2O_cluster"+str(ccluster))
+plt.close()
+plt.plot(time_plot, OHplusO, color="k")
+plt.savefig("OH+O_cluster"+str(ccluster))
+plt.close()
+plt.plot(time_plot, OOH, color="b")
+plt.savefig("OOH_cluster"+str(ccluster))
+plt.close()
+plt.plot(time_plot, H2OplusO, color="m")
+plt.savefig("H20+O_cluster"+str(ccluster))
+plt.close()
+plt.plot(time_plot, TwoOH, color="c")
+plt.savefig("2OH_cluster"+str(ccluster))
+plt.close()
+plt.plot(time_plot, H2OplusOH, color="burlywood")
+plt.savefig("H20+OH_cluster"+str(ccluster))
+plt.close()
+plt.plot(time_plot, water_plot, color="b")
+plt.savefig("Water_cluster"+str(ccluster))
+plt.close()
+
+
+
+
+
 at_total += t_total
 aritt += itt
 awater += water*2
@@ -940,7 +1021,7 @@ tonar += awater/at_total
 tonaracs += awater/(at_total*nl)
 tonarals += awater/(at_total*(nl+nm+nh))
 
-g.write(" END ")
+#g.write(" END ")
 
 if i != 1:
     at_total2 = format(at_total,'.4f')
@@ -964,7 +1045,7 @@ print("Number of MC steps:", aritt)
 print("Water produced:", awater)
 
 summ.write("\nSummary of simulation for " + desg)
-summ.write("\n\nNanoparticle with:\n"+str(nl1)+" Low sites\n"+str(nm1)+" Medium sites\n"+str(nh1)+" High sites\n")
+#summ.write("\n\nNanoparticle with:\n"+str(nl1)+" Low sites\n"+str(nm1)+" Medium sites\n"+str(nh1)+" High sites\n")
 summ.write("Simulated time interval: ") 
 summ.write(str(at_total2)+"s")
 summ.write("\n\n\n")
@@ -987,8 +1068,8 @@ summ.write("\n")
 time2 = time.time()
 summ.write("Time taken to run the simulation "+ str(time2-time1))
 
-col.write(str(testno)+'\t'+str(nl1)+'\t'+str(nm1)+'\t'+str(nh1)+'\t'+str(nl1+nm1+nh1)+'\t'+str(coverage)+'\t'+str(awater)+'\t'+str(at_total2)+'\t'+str(time2-time1)+'\t'+str(temperature)+'\n')
-allcol.write(desg+'\t'+str(testno)+'\t'+str(nl1)+'\t'+str(nm1)+'\t'+str(nh1)+'\t'+str(nl1+nm1+nh1)+'\t'+str(coverage)+'\t'+str(awater)+'\t'+str(at_total2)+'\t'+str(time2-time1)+'\t'+str(temperature)+'\n')
+#col.write(str(simno)+'\t'+str(nl1)+'\t'+str(nm1)+'\t'+str(nh1)+'\t'+str(nl1+nm1+nh1)+'\t'+str(coverage)+'\t'+str(awater)+'\t'+str(at_total2)+'\t'+str(time2-time1)+'\t'+str(temperature)+'\n')
+#allcol.write(desg+'\t'+str(simno)+'\t'+str(nl1)+'\t'+str(nm1)+'\t'+str(nh1)+'\t'+str(nl1+nm1+nh1)+'\t'+str(coverage)+'\t'+str(awater)+'\t'+str(at_total2)+'\t'+str(time2-time1)+'\t'+str(temperature)+'\n')
 
 #CHECK: time the simulation runs for
 print("Time for simulation to run:", time2 - time1)
